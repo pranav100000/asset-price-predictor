@@ -1,6 +1,9 @@
 import yfinance as yf
 from prophet import Prophet
+import sentiment_analyzer
 import matplotlib.pyplot as plt
+import pandas as pd
+
 
 class YahooFinanceClient:
     def __init__(self):
@@ -13,7 +16,7 @@ class YahooFinanceClient:
             ticker_data = yf.Ticker(ticker_symbol)
             
             # Get historical prices for this ticker
-            ticker_df = ticker_data.history(period='day', start='2023-01-01', end='2024-01-01')
+            ticker_df = ticker_data.history(period='day', start='2023-01-29', end='2024-01-29')
             
             # If the DataFrame is empty, it means the ticker symbol was invalid or data is unavailable
             if ticker_df.empty:
@@ -59,17 +62,31 @@ def main():
     # Fetch and display the data
     data = yfc.fetch_data(ticker_symbol)
     print(data)
-    
+
     pc = ProphetClient()
-    
+
     forecast = pc.fit_model(data)
-    
+
     # pc.prophet.plot(forecast)
     # plot = pc.prophet.plot_components(forecast)
     # plot.show()
-    
+
+
+    sa = sentiment_analyzer.NewsScraperAndSentimentAnalyzer()
+    dates_and_sentiments = sa.fetch_all_news(ticker_symbol, 365, 0)
+
     plt.show()
     
+    df = pd.DataFrame(dates_and_sentiments, columns=['ds', 'y'])
+    print(df)
+    plt.plot(df['ds'], df['y'])
+    plt.xlabel('Date')
+    plt.ylabel('Sentiment Score')
+    
+    delta_stock_price = data['y'].diff()
+    delta_stock_price = delta_stock_price.dropna()
+    correlation = delta_stock_price.corr(df['y'])
+    print("Correlation between stock price and sentiment score:", correlation)
     
 if __name__ == "__main__":
     main()

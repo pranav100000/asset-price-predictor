@@ -1,3 +1,3 @@
-[submodule "web-crawler-to-openai-summary"]
-	path = web-crawler-to-openai-summary
+[submodule "web_crawler_to_openai_summary"]
+	path = web_crawler_to_openai_summary
 	url = git@github.com:pranav100000/web-crawler-to-openai-summary.git
